@@ -96,13 +96,16 @@ def game_loop():
 
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
             game_close = True
+
         x1 += current_direction_x
         y1 += current_direction_y
 
         dis.fill(blue)
         pygame.draw.rect(dis, red2, [foods, fody, snake_block, snake_block])
+
         snake_head = [x1, y1]
         snake_list.append(snake_head)
+
         if len(snake_list) > length_of_snake:
             del snake_list[0]
 
@@ -118,6 +121,16 @@ def game_loop():
         if x1 == foods and y1 == fody:
             foods = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             fody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+
+            while (
+                foods < 3 * snake_block
+                or foods > dis_width - 4 * snake_block
+                or fody < 3 * snake_block
+                or fody > dis_height - 4 * snake_block
+            ):
+                foods = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
+                fody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+
             length_of_snake += 1
 
         clock.tick(snake_speed)
