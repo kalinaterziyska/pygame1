@@ -9,9 +9,9 @@ black = (0, 0, 0)
 red = (102, 0, 0)
 red2 = (153, 0, 76)
 green = (0, 255, 0)
-blue = (65, 242, 242)
+blue = (164, 210, 245)
 
-dis_width = 700
+dis_width = 800
 dis_height = 800
 
 dis = pygame.display.set_mode((dis_width, dis_height))
@@ -20,10 +20,13 @@ pygame.display.set_caption("Kalina's Snake Game")
 clock = pygame.time.Clock()
 
 snake_block = 10
-snake_speed = 13
+snake_speed = 10
 
 font_style = pygame.font.SysFont("spendthrift", 25)
 score_font = pygame.font.SysFont("cosmeticians", 35)
+
+apple_img = pygame.image.load("apple.png")
+apple_img = pygame.transform.scale(apple_img, (snake_block * 1.3, snake_block * 1.3))
 
 
 def your_score(score):
@@ -38,7 +41,14 @@ def our_snake(block, snake_list):
 
 def message(msg, color):
     my_message = font_style.render(msg, True, color)
-    dis.blit(my_message, [dis_width / 6, dis_height / 3])
+    dis.blit(my_message, [dis_width / 6, dis_height / 5])
+
+
+def is_collision(x1, y1, x2, y2, collision_range):
+    distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+    if distance < collision_range:
+        return True
+    return False
 
 
 def game_loop():
@@ -54,8 +64,8 @@ def game_loop():
     snake_list = []
     length_of_snake = 1
 
-    foods = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-    fody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+    food_x = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
+    food_y = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
 
     while not game_over:
 
@@ -66,6 +76,9 @@ def game_loop():
             pygame.display.update()
 
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_over = True
+
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
                         game_over = True
@@ -101,7 +114,7 @@ def game_loop():
         y1 += current_direction_y
 
         dis.fill(blue)
-        pygame.draw.rect(dis, red2, [foods, fody, snake_block, snake_block])
+        dis.blit(apple_img, (food_x, food_y))
 
         snake_head = [x1, y1]
         snake_list.append(snake_head)
@@ -118,18 +131,25 @@ def game_loop():
 
         pygame.display.update()
 
-        if x1 == foods and y1 == fody:
-            foods = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-            fody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+        if is_collision(x1, y1, food_x, food_y, snake_block):
+            food_x = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
+            food_y = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+
+            if length_of_snake % 5 == 0 and length_of_snake <= 15:
+                clock.tick(snake_speed + 3)
+            elif length_of_snake % 5 == 0 and 30 >= length_of_snake > 15:
+                clock.tick(snake_speed + 6)
+            elif length_of_snake % 5 == 0 and 45 >= length_of_snake > 30:
+                clock.tick(snake_speed + 10)
 
             while (
-                foods < 3 * snake_block
-                or foods > dis_width - 4 * snake_block
-                or fody < 3 * snake_block
-                or fody > dis_height - 4 * snake_block
+                food_x < 3 * snake_block
+                or food_x > dis_width - 4 * snake_block
+                or food_y < 3 * snake_block
+                or food_y > dis_height - 4 * snake_block
             ):
-                foods = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-                fody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
+                food_x = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
+                food_y = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
 
             length_of_snake += 1
 
@@ -140,3 +160,6 @@ def game_loop():
 
 
 game_loop()
+
+# да добавя звук при яденето на ябълка и да записвам всичките скорове от едно разиграване в масив
+# и да ги ижвеждам като свърши един рунд преди  да е затворен прожореца с Q
