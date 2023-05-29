@@ -1,5 +1,6 @@
 import random
 import pygame
+# import pygame.mixer
 
 pygame.init()
 
@@ -26,7 +27,9 @@ font_style = pygame.font.SysFont("spendthrift", 25)
 score_font = pygame.font.SysFont("cosmeticians", 35)
 
 apple_img = pygame.image.load("apple.png")
-apple_img = pygame.transform.scale(apple_img, (snake_block * 1.3, snake_block * 1.3))
+apple_img = pygame.transform.scale(apple_img, (int(snake_block * 1.3), int(snake_block * 1.3)))
+
+eat_sound = pygame.mixer.Sound("eat_sound.mp3")
 
 
 def your_score(score):
@@ -38,6 +41,13 @@ def our_snake(block, snake_list):
     for x in snake_list:
         pygame.draw.rect(dis, black, [x[0], x[1], block, block])
 
+    if len(snake_list) > 0:
+        x1, y1 = snake_list[-1]
+        left_eye = (x1 + block // 3, y1 + block // 3)
+        right_eye = (x1 + 2 * block // 3, y1 + block // 3)
+        pygame.draw.circle(dis, white, left_eye, block // 10)
+        pygame.draw.circle(dis, white, right_eye, block // 10)
+
 
 def message(msg, color):
     my_message = font_style.render(msg, True, color)
@@ -47,6 +57,7 @@ def message(msg, color):
 def is_collision(x1, y1, x2, y2, collision_range):
     distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
     if distance < collision_range:
+        pygame.mixer.Sound.play(eat_sound)
         return True
     return False
 
@@ -109,6 +120,7 @@ def game_loop():
 
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
             game_close = True
+            # pygame.mixer.Sound.play(game_over_sound)
 
         x1 += current_direction_x
         y1 += current_direction_y
@@ -153,7 +165,7 @@ def game_loop():
 
             length_of_snake += 1
 
-        clock.tick(snake_speed)
+        clock.tick(snake_speed + 2)
 
     pygame.quit()
     quit()
@@ -161,5 +173,6 @@ def game_loop():
 
 game_loop()
 
-# да добавя звук при яденето на ябълка и да записвам всичките скорове от едно разиграване в масив
+
+# да добавя звук при умирането и да записвам всичките скорове от едно разиграване в масив
 # и да ги ижвеждам като свърши един рунд преди  да е затворен прожореца с Q
