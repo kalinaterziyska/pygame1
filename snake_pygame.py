@@ -41,7 +41,7 @@ def show_menu():
         dis.fill(blue)
         message("Snake Game Menu", black, y_offset=-50)
         message("Choose an option:", black, y_offset=50)
-        message("1. Play with Walls", black, y_offset=100)
+        message("1. Play with Obstacles", black, y_offset=100)
         message("2. Play without Obstacles", black, y_offset=150)
 
         for event in pygame.event.get():
